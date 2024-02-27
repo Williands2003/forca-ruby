@@ -9,11 +9,9 @@ class Forca
   end
 
   def tentativa(letra)
-    letra = letra.downcase
+    letra.downcase!
     if @palavra_secreta.include?(letra)
-      @palavra_secreta.chars.each_with_index do |char, idx|
-        @palavra_descoberta[idx] = char if char == letra
-      end
+      @palavra_secreta.chars.each_with_index { |char, idx| @palavra_descoberta[idx] = char if char == letra }
     else
       @tentativas_restantes -= 1
       @letras_erradas << letra
@@ -42,18 +40,14 @@ def jogar_forca
     puts "\n"
     mostrar_status(forca)
     puts "Digite uma letra:"
-    letra = gets.chomp
-    forca.tentativa(letra)
+    forca.tentativa(gets.chomp)
   end
 
   puts "\n"
   mostrar_status(forca)
 
-  if forca.palavra_descoberta == forca.palavra_secreta
-    puts "Parabéns! Você ganhou!"
-  else
-    puts "Você perdeu! A palavra era #{forca.palavra_secreta}."
-  end
+  puts forca.palavra_descoberta == forca.palavra_secreta ? "Parabéns! Você ganhou!" : "Você perdeu! A palavra era #{forca.palavra_secreta}."
 end
 
 jogar_forca
+
