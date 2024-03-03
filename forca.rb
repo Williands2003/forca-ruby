@@ -1,11 +1,22 @@
 class Forca
   attr_reader :palavra_secreta, :palavra_descoberta, :tentativas_restantes, :letras_erradas
 
-  def initialize(palavra)
-    @palavra_secreta = palavra.downcase
-    @palavra_descoberta = "_" * palavra.length
-    @tentativas_restantes = 6
+  def initialize(dificuldade, palavra = nil)
+    @dificuldade = dificuldade
+    @palavras_por_dificuldade = {
+      facil: ["gato", "cachorro", "banana"],
+      medio: ["elefante", "computador", "abacaxi"],
+      dificil: ["hipopotamo", "aerodinamica", "ametropia"]
+    }
+
+    @palavra_secreta = palavra || selecionar_palavra_aleatoria
+    @palavra_descoberta = "_" * @palavra_secreta.length
+    @tentativas_restantes = dificuldade == :facil ? 8 : dificuldade == :medio ? 6 : 4
     @letras_erradas = []
+  end
+
+  def selecionar_palavra_aleatoria
+    @palavras_por_dificuldade[@dificuldade].sample.downcase
   end
 
   def tentativa(letra)
@@ -21,6 +32,14 @@ class Forca
   def jogo_acabou?
     @tentativas_restantes.zero? || @palavra_descoberta == @palavra_secreta
   end
+
+  def pontos
+    if @palavra_descoberta == @palavra_secreta
+      @tentativas_restantes * 10
+    else
+      0
+    end
+  end
 end
 
 def mostrar_status(forca)
@@ -31,10 +50,10 @@ end
 
 def jogar_forca
   puts "Bem-vindo ao jogo da Forca!"
-  puts "Digite uma palavra:"
-  palavra = gets.chomp
+  puts "Escolha um nível de dificuldade (facil, medio, dificil):"
+  dificuldade = gets.chomp.downcase.to_sym
 
-  forca = Forca.new(palavra)
+  forca = Forca.new(dificuldade)
 
   until forca.jogo_acabou?
     puts "\n"
@@ -46,8 +65,14 @@ def jogar_forca
   puts "\n"
   mostrar_status(forca)
 
-  puts forca.palavra_descoberta == forca.palavra_secreta ? "Parabéns! Você ganhou!" : "Você perdeu! A palavra era #{forca.palavra_secreta}."
+  if forca.palavra_descoberta == forca.palavra_secreta
+    puts "Parabéns! Você ganhou!"
+    puts "Pontuação: #{forca.pontos}"
+  else
+    puts "Você perdeu! A palavra era #{forca.palavra_secreta}."
+  end
 end
 
 jogar_forca
+
 
